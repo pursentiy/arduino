@@ -11,6 +11,34 @@ int _yearLength;
 int _numberPieces[4];
 bool _finishYearcounter = false;
 
+// Barrier detector
+#define PIN_YL63 5
+#define barrier digitalRead(PIN_YL63)
+
+const int LED = 9;
+const int ZUMMER = 8;
+
+void BarrierDetector()
+{
+
+  if (barrier == 1)
+  {
+    // Зона обнаружения препятствия
+    while (barrier == 1) // Ждем выхода
+    {
+      ;
+    }
+  }
+  else
+  {
+    DispMSG[6, 6, 6, 6]; // Вне зоны обнаружения препятствия
+    while (barrier != 1) // Ждем входа
+    {
+      ;
+    }
+  }
+}
+
 int GetNumberLength(int number)
 {
   int length = 0;
@@ -57,6 +85,17 @@ void GetNumberPieces(int year, int numberYears)
 
 void SetTimer()
 {
+  // if (_numberPieces == NULL)
+  // {
+  //   _yearLength = GetNumberLength(_yearCounter);
+  //   GetNumberPieces(_yearCounter, _yearLength);
+  // }
+
+  // Serial.println(_numberPieces[0]);
+  // Serial.println(_numberPieces[1]);
+  // Serial.println(_numberPieces[2]);
+  // Serial.println(_numberPieces[3]);
+  
   DispMSG[0] = _numberPieces[0]; //(int)(yearString[0]);
   DispMSG[1] = _numberPieces[1]; //(int)(yearString[1]);
   DispMSG[2] = _numberPieces[2]; //(int)(yearString[2]);
@@ -68,7 +107,7 @@ void IncrementTimer(int arraylength, int incrementNumber, int maxYear, int delay
 {
   bool ifSkip = false;
   String resultNumber = "";
-
+  
   for (int i = arraylength - 1; i >= 0; i--)
   {
 
@@ -92,7 +131,7 @@ void IncrementTimer(int arraylength, int incrementNumber, int maxYear, int delay
   }
 
   _yearCounter = resultNumber.toInt();
-  Serial.println(resultNumber);
+  //Serial.println(resultNumber);
 
   if (_yearCounter >= maxYear)
   {
@@ -100,12 +139,27 @@ void IncrementTimer(int arraylength, int incrementNumber, int maxYear, int delay
   }
 }
 
+//(String(i) + substructNumber).toInt();
+//
+
+void PlayZummer()
+{
+  //tone(ZUMMER, 2048, 100);
+}
+
+void LightLED()
+{
+  digitalWrite(LED, HIGH);
+  delay(200);
+  digitalWrite(LED, LOW);
+  delay(200);
+}
 
 void setup()
 {
-  Serial.begin(115200);
-  // tm1637.init();
-  // tm1637.set(BRIGHT_TYPICAL);
+  Serial.begin(9600);
+  //tm1637.init();
+  //tm1637.set(BRIGHT_TYPICAL);
   /*
      BRIGHT_TYPICAL = 2 Средний
      BRIGHT_DARKEST = 0 Тёмный
@@ -126,16 +180,36 @@ void setup()
   // Serial.println(_numberPieces[2]);
   // Serial.println(_numberPieces[3]);
 
+  // pinMode(PIN_YL63, INPUT);
+  // pinMode(ZUMMER, OUTPUT);
 }
 
 void loop()
 {
+  
+  if(!_finishYearcounter)
+  {
   GetNumberPieces(_yearCounter, _yearLength);
-  IncrementTimer(_yearCounter, 1, 2000, 1000);
-
+  IncrementTimer(_yearLength, 1, 2000, 1000);
+  Serial.println(_yearCounter);
+  delay(500);
+  }
+  
   // Serial.print(_numberPieces[0]);
   // Serial.print(_numberPieces[1]);
   // Serial.print(_numberPieces[2]);
   // Serial.print(_numberPieces[3]);
-  delay(1000);
+
+  //SetTimer();
+
+  //   if(millis()  - last_time > 100){
+  //    last_time = millis();
+  //    tm1637.display(DispMSG);
+  //    DispMSG[1]++;
+  //
+  //    if(DispMSG[3] == 10)
+  //    {
+  //       DispMSG[3] = 0;
+  //    }
+  //  }
 }
